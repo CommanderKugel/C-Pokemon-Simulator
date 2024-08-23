@@ -1,9 +1,10 @@
 public class Switch : Action
 {
     public PokeCond bankedMon;
-    int Team;
+    public int Team;
+    public int priority = 10;
 
-    public Switch(PokeCond bankedMon, int Team) : base(false) 
+    public Switch(PokeCond bankedMon, int Team) : base(false, 10) 
     {
         this.bankedMon = bankedMon;
         this.Team = Team;

@@ -7,7 +7,7 @@ public class Battle
 
     const int MAX_PLY = 64;
     public int ply;
-    public ref Pos CurrPos => ref Positions[ply];
+    public Pos CurrPos => Positions[ply];
 
     public Battle(Pokemon[] TeamA, Pokemon[] TeamB)
     {
@@ -61,31 +61,47 @@ public class Battle
         
     }
 
-    
 
-    public void MakeTurn(Move moveA, Move moveB)
+    public void MakeSwitch(Switch s, PokeCond active)
     {
-        ref Pos pos = ref CurrPos;
+        var arr = CurrPos.allConditions[s.Team];
+        int index = Array.IndexOf(arr, s.bankedMon);
+        (arr[index], arr[0]) = (arr[0], arr[index]);
+
+        // update to remove certain effects
+        // e.g. choice-moves, confusion, ...
+    }
+
+    public void TakeAction (Action a, PokeCond attacker, PokeCond defender) 
+    {
+        if (a is Move) MakeSingleMove(a as Move, attacker, defender);
+        else MakeSwitch(a as Switch, attacker);
+    }    
+
+    public void MakeTurn(Action actA, Action actB)
+    {
+        Pos pos = CurrPos;
         PokeCond pokeA = pos.getActivePokemon(0);
         PokeCond pokeB = pos.getActivePokemon(1);
 
         Console.WriteLine($"\nTurn {ply}");
         
         // determine move order
-        bool aGoesFirst = goesFirst(moveA.priority, moveB.priority, pokeA.StatsEffective[Init], pokeB.StatsEffective[Init]);
+        bool aGoesFirst = goesFirst(actA.priority, actB.priority, pokeA.StatsEffective[Init], pokeB.StatsEffective[Init]);
 
         // make moves in order
         if (aGoesFirst)
         {
-            MakeSingleMove(moveA, pokeA, pokeB);
-            MakeSingleMove(moveB, pokeB, pokeA);
+            TakeAction(actA, pokeA, pokeB);
+            TakeAction(actB, pokeB, pokeA);
         } 
         else 
         {
-            MakeSingleMove(moveB, pokeB, pokeA);
-            MakeSingleMove(moveA, pokeA, pokeB);
+            TakeAction(actB, pokeB, pokeA);
+            TakeAction(actA, pokeA, pokeB);
         }
 
+        // update if last Action changed Stats
         pokeA.CalculateStatsEffective();
         pokeB.CalculateStatsEffective();
 

@@ -1,6 +1,11 @@
 public abstract class Action
 {
     public bool isMove;
+    public int priority;
 
-    public Action(bool isMove) => this.isMove = isMove;
+    public Action(bool isMove, int priority) 
+    {
+        this.isMove = isMove;
+        this.priority = priority;
+    }
 }

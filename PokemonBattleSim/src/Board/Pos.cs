@@ -2,9 +2,8 @@ public struct Pos
 {
     public Battle battle;
     public PokeCond[][] allConditions;
-    public int[] activeMonIndex;
 
-    public ref PokeCond getActivePokemon(int Team) => ref allConditions[Team][activeMonIndex[Team]];
+    public PokeCond getActivePokemon(int Team) => allConditions[Team][0];
 
     public Pos(Battle b)
     {
@@ -13,7 +12,6 @@ public struct Pos
             b.Teams[0].Select(x => new PokeCond(x)).ToArray(),
             b.Teams[1].Select(x => new PokeCond(x)).ToArray(),
         };
-        this.activeMonIndex = new int[] { 0, 0 };
     }
 
     public Pos(Pos prev)
@@ -22,6 +20,5 @@ public struct Pos
         allConditions = prev.allConditions.Select(
             arr => arr.Select(x => new PokeCond(x)).ToArray()
         ).ToArray();
-        this.activeMonIndex = prev.activeMonIndex.ToArray();
     }
 }

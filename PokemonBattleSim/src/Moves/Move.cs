@@ -8,7 +8,6 @@ public class Move : Action
 
     public readonly int Accuracy;
     public readonly int Power;
-    public readonly int priority;
 
     private readonly Func<Move, PokeCond, PokeCond, int> CalcDmgFunc;
     public int CalcDmg(PokeCond att, PokeCond def) => this.CalcDmgFunc(this, att, def);
@@ -26,7 +25,7 @@ public class Move : Action
         int Priority = 0,
         Action<PokeCond, PokeCond> OnHitEffAct = null
     ) 
-    : base(true) 
+    : base(true, Priority) 
     {
         this.name = name;
         this.Category = Category;
@@ -34,7 +33,6 @@ public class Move : Action
         this.Accuracy = Accuracy;
         this.Power = Power;
         this.CalcDmgFunc = CalcDmgFunc is null ? DamageCalc.CalculateRawDamage : CalcDmgFunc;
-        this.priority = Priority;
         this.OnHitEffAct = OnHitEffAct is null ? OnHitEffects.NoEffect : OnHitEffAct;
     }
 
