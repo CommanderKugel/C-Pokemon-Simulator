@@ -11,7 +11,7 @@ public static class Helper
     public static Move Earthquake = new("Earthquake", Category.Physical, PType.Ground, 100);
     public static Move Flamethrower = new("Flamethrower", Category.Special, PType.Fire, 90);
     public static Move Dragonclaw = new("Dragonclaw", Category.Physical, PType.Dragon, 80);
-    public static Move Swordsdance = new("Swords Dance", Category.Status, PType.Normal, OnHitEffAct: OnHitEffects.riseAttackTwice);
+    public static Move Swordsdance = new("Swords Dance", Category.Status, PType.Normal, OnHitEffAct: OnHitEffects.raiseAttackTwice);
 
     public static Pokemon MyGarchomp = new("Chompa", Garchomp, new byte[] { 0, 252, 0, 0, 0, 252 }, Nature.Adamant, 50, new Move[] { Earthquake, Dragonclaw, Swordsdance });
     public static Pokemon MyHeatran = new("Train", Heatran, new byte[] { 252, 0, 0, 252, 0, 0, 0 }, Nature.Modest, 50, new Move[] { Flamethrower});

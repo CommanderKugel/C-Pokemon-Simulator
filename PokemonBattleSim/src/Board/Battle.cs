@@ -18,11 +18,12 @@ public class Battle
     }
 
     public void MakeSingleMove(Move move, PokeCond attacker, PokeCond defender,
-                               bool useRandomRanges=true)
+                               bool useRandomRanges=true,
+                               bool useCritRoll=true)
     {
         if (attacker.isFainted || !attacker.canUseMove(move))
         {
-            Console.WriteLine($"{attacker.Nickname} can not attack!");
+            Console.WriteLine($"{attacker.Nickname} can not use {move.name}!");
             return;
         }
 
@@ -32,7 +33,8 @@ public class Battle
         {
             // damaging part
             int dmg = move.CalcDmg(attacker, defender);
-            if (useRandomRanges) dmg = (int)(dmg * DamageCalc.getRandomDamagemult);
+            if (useRandomRanges) dmg = (int)(dmg * DamageCalc.getRandomRollvalue);
+            if (useCritRoll) dmg = (int)(dmg * DamageCalc.getCritRollValue);
             
             defender.dealDamage(dmg);
             Console.WriteLine($"{defender.Nickname} took {(int)((float)dmg / (float)defender.stats[HP] * 100)}% damage");
@@ -68,14 +70,12 @@ public class Battle
         if (aGoesFirst)
         {
             MakeSingleMove(moveA, pokeA, pokeB);
-            if (!pokeB.isFainted)
-                MakeSingleMove(moveB, pokeB, pokeA);
+            MakeSingleMove(moveB, pokeB, pokeA);
         } 
         else 
         {
             MakeSingleMove(moveB, pokeB, pokeA);
-            if (!pokeB.isFainted)
-                MakeSingleMove(moveA, pokeA, pokeB);
+            MakeSingleMove(moveA, pokeA, pokeB);
         }
 
         pokeA.CalculateStatsEffective();
