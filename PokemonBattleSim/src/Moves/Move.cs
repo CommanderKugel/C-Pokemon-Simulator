@@ -1,6 +1,6 @@
 using static Stats;
 
-public class Move
+public class Move : Action
 {
     public readonly string name;
     public readonly Category Category;
@@ -25,7 +25,9 @@ public class Move
         Func<Move, PokeCond, PokeCond, int> CalcDmgFunc = null,
         int Priority = 0,
         Action<PokeCond, PokeCond> OnHitEffAct = null
-    ) {
+    ) 
+    : base(true) 
+    {
         this.name = name;
         this.Category = Category;
         this.Type = Type;

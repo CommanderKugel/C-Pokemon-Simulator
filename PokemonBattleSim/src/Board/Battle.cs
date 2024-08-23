@@ -17,10 +17,13 @@ public class Battle
         ply = 0;
     }
 
-    public void MakeSingleMove(Move move, PokeCond attacker, PokeCond defender,
-                               bool useRandomRanges=true,
-                               bool useCritRoll=true)
-    {
+
+    public void MakeSingleMove (
+        Move move, PokeCond attacker, PokeCond defender,
+        bool useRandomRanges=true,
+        bool useCritRoll=true,
+        bool canMiss=true
+    ) {
         if (attacker.isFainted || !attacker.canUseMove(move))
         {
             Console.WriteLine($"{attacker.Nickname} can not use {move.name}!");
@@ -28,6 +31,12 @@ public class Battle
         }
 
         Console.WriteLine($"{attacker.Nickname} used {move.name}!");
+
+        if (canMiss && move.Accuracy < 100 && Helper.rng.Next(0, 100) > move.Accuracy)
+        {
+            Console.WriteLine("it missed!");
+            return;
+        }
 
         if (move.Category != Category.Status)
         {
@@ -45,17 +54,14 @@ public class Battle
                 Console.WriteLine($"{defender.Nickname} fainted!");
                 return;
             }
-
-            
-            // effect part
-            move.OnHitEffect(attacker, defender);
-        }
-        else 
-        {
-            move.OnHitEffect(attacker, defender);
         }
         
+        // damaging moves and status moves can both have effects
+        move.OnHitEffect(attacker, defender);
+        
     }
+
+    
 
     public void MakeTurn(Move moveA, Move moveB)
     {

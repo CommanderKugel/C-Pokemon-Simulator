@@ -35,6 +35,7 @@ public class PokeCond
 
     public bool moveIsLearned(Move move) => this.pokemon.MoveSet.Contains(move);
     public bool canUseMove(Move move) => this.moveIsLearned(move); // Choice Items Here
+    public bool canMove() => false; // paralysis-, confusion-, flinchcheck here
 
 
     public void CalculateStatsEffective() 
