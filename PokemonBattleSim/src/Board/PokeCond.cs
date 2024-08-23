@@ -46,5 +46,5 @@ public class PokeCond
         }
     }
 
-    public void ChangeStats(int stat, int c) => StatChanges[stat] += (sbyte) c;
+    public void ChangeStats(int stat, int c) => StatChanges[stat] = (sbyte)Math.Clamp(StatChanges[stat]+c, -6, 6);
 }

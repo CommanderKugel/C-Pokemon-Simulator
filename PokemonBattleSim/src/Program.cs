@@ -1,5 +1,6 @@
 ﻿using static Stats;
-using static Helper;
+using static allPokemon;
+using static allMoves;
 
 Pokemon[] TeamA = new Pokemon[] { MyGarchomp };
 Pokemon[] TeamB = new Pokemon[] { MyHeatran };

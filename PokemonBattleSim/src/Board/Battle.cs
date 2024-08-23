@@ -40,7 +40,11 @@ public class Battle
             Console.WriteLine($"{defender.Nickname} took {(int)((float)dmg / (float)defender.stats[HP] * 100)}% damage");
 
             // faint check
-            if (defender.isFainted) Console.WriteLine($"{defender.Nickname} fainted!");
+            if (defender.isFainted) 
+            {
+                Console.WriteLine($"{defender.Nickname} fainted!");
+                return;
+            }
 
             
             // effect part
@@ -48,9 +52,7 @@ public class Battle
         }
         else 
         {
-            Console.WriteLine($"attack prev: {attacker.StatChanges[Atk]}");
             move.OnHitEffect(attacker, defender);
-            Console.WriteLine($"attack post: {attacker.StatChanges[Atk]}");
         }
         
     }
