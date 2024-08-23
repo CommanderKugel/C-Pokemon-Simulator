@@ -17,25 +17,40 @@ public class Battle
         ply = 0;
     }
 
-    public void MakeSingleMove(Move move, ref PokeCond attacker, ref PokeCond defender,
+    public void MakeSingleMove(Move move, PokeCond attacker, PokeCond defender,
                                bool useRandomRanges=true)
     {
         if (attacker.isFainted || !attacker.canUseMove(move))
         {
-            Console.WriteLine($"{attacker.Nickname} used Splash!");
+            Console.WriteLine($"{attacker.Nickname} can not attack!");
             return;
         }
 
         Console.WriteLine($"{attacker.Nickname} used {move.name}!");
-        int dmg = move.CalcDmg(attacker, defender);
 
-        if (useRandomRanges) dmg = (int)(dmg * DamageCalc.getRandomDamagemult);
+        if (move.Category != Category.Status)
+        {
+            // damaging part
+            int dmg = move.CalcDmg(attacker, defender);
+            if (useRandomRanges) dmg = (int)(dmg * DamageCalc.getRandomDamagemult);
+            
+            defender.dealDamage(dmg);
+            Console.WriteLine($"{defender.Nickname} took {(int)((float)dmg / (float)defender.stats[HP] * 100)}% damage");
 
-        defender.dealDamage(dmg);
-        Console.WriteLine($"{defender.Nickname} took {(int)((float)dmg / (float)defender.stats[HP] * 100)}% damage");
+            // faint check
+            if (defender.isFainted) Console.WriteLine($"{defender.Nickname} fainted!");
 
-        if (defender.isFainted)
-            Console.WriteLine($"{defender.Nickname} fainted!");
+            
+            // effect part
+            move.OnHitEffect(attacker, defender);
+        }
+        else 
+        {
+            Console.WriteLine($"attack prev: {attacker.StatChanges[Atk]}");
+            move.OnHitEffect(attacker, defender);
+            Console.WriteLine($"attack post: {attacker.StatChanges[Atk]}");
+        }
+        
     }
 
     public void MakeTurn(Move moveA, Move moveB)
@@ -52,16 +67,19 @@ public class Battle
         // make moves in order
         if (aGoesFirst)
         {
-            MakeSingleMove(moveA, ref pokeA, ref pokeB);
+            MakeSingleMove(moveA, pokeA, pokeB);
             if (!pokeB.isFainted)
-                MakeSingleMove(moveB, ref pokeB, ref pokeA);
+                MakeSingleMove(moveB, pokeB, pokeA);
         } 
         else 
         {
-            MakeSingleMove(moveB, ref pokeB, ref pokeA);
+            MakeSingleMove(moveB, pokeB, pokeA);
             if (!pokeB.isFainted)
-                MakeSingleMove(moveA, ref pokeA, ref pokeB);
+                MakeSingleMove(moveA, pokeA, pokeB);
         }
+
+        pokeA.CalculateStatsEffective();
+        pokeB.CalculateStatsEffective();
 
         // update boardstate
         this.ply++;

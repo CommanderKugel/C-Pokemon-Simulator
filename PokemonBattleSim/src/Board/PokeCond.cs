@@ -1,6 +1,6 @@
 using static Stats;
 
-public struct PokeCond
+public class PokeCond
 {
     public readonly Pokemon pokemon;
     public int[] StatsEffective;
@@ -46,5 +46,5 @@ public struct PokeCond
         }
     }
 
-    public void ChangeStats(int stat, int c) => StatChanges[stat] = (sbyte) Math.Clamp(StatChanges[stat] + c, -6, 6);
+    public void ChangeStats(int stat, int c) => StatChanges[stat] += (sbyte) c;
 }
