@@ -17,7 +17,7 @@ public class Battle
         ply = 0;
     }
 
-    public void MakeSingleMove(Move move, PokeCond attacker, PokeCond defender,
+    public void MakeSingleMove(Move move, ref PokeCond attacker, ref PokeCond defender,
                                bool useRandomRanges=true)
     {
         if (attacker.isFainted || !attacker.canUseMove(move))
@@ -47,12 +47,21 @@ public class Battle
         Console.WriteLine($"\nTurn {ply}");
         
         // determine move order
-        var (firstMove, firstMon, secondMove, secondMon) = orderTurn(moveA, pokeA, moveB, pokeB);
+        bool aGoesFirst = goesFirst(moveA.priority, moveB.priority, pokeA.StatsEffective[Init], pokeB.StatsEffective[Init]);
 
         // make moves in order
-        MakeSingleMove(firstMove, firstMon, secondMon);
-        if (!secondMon.isFainted)
-            MakeSingleMove(secondMove, secondMon, firstMon);
+        if (aGoesFirst)
+        {
+            MakeSingleMove(moveA, ref pokeA, ref pokeB);
+            if (!pokeB.isFainted)
+                MakeSingleMove(moveB, ref pokeB, ref pokeA);
+        } 
+        else 
+        {
+            MakeSingleMove(moveB, ref pokeB, ref pokeA);
+            if (!pokeB.isFainted)
+                MakeSingleMove(moveA, ref pokeA, ref pokeB);
+        }
 
         // update boardstate
         this.ply++;
@@ -62,25 +71,10 @@ public class Battle
         Console.WriteLine($"{pokeA.Nickname} HP: {pokeA.StatsEffective[HP]}, {pokeB.Nickname} HP: {pokeB.StatsEffective[HP]}");
     }
 
-    public (Move, PokeCond, Move, PokeCond) orderTurn(Move moveA, PokeCond pokeA, Move moveB, PokeCond pokeB)
+    public bool goesFirst (int prioA, int prioB, int initA, int initB)
     {
-        if (moveA.priority != moveB.priority)
-        {
-            return (moveA.priority > moveB.priority)
-                   ? (moveA, pokeA, moveB, pokeB)
-                   : (moveB, pokeB, moveA, pokeA);
-        }
-        else if (pokeA.StatsEffective[Init] == pokeB.StatsEffective[Init])
-        {
-            return (Helper.rng.Next(2) == 0)
-                   ? (moveA, pokeA, moveB, pokeB)
-                   : (moveB, pokeB, moveA, pokeA);
-        }
-        else // prio is equal, init is not equal
-        {
-            return (pokeA.StatsEffective[Init] > pokeB.StatsEffective[Init])
-                   ? (moveA, pokeA, moveB, pokeB)
-                   : (moveB, pokeB, moveA, pokeA);
-        }
+        if (prioA != prioB) return prioA > prioB;
+        if (initA != initB) return initA > initB;
+        return Helper.rng.Next(0, 2) == 0;
     }
 }
