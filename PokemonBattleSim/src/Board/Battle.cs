@@ -17,7 +17,8 @@ public class Battle
         ply = 0;
     }
 
-    public void MakeSingleMove(Move move, PokeCond attacker, PokeCond defender)
+    public void MakeSingleMove(Move move, PokeCond attacker, PokeCond defender,
+                               bool useRandomRanges=true)
     {
         if (attacker.isFainted || !attacker.canUseMove(move))
         {
@@ -27,6 +28,9 @@ public class Battle
 
         Console.WriteLine($"{attacker.Nickname} used {move.name}!");
         int dmg = move.CalcDmg(attacker, defender);
+
+        if (useRandomRanges) dmg = (int)(dmg * DamageCalc.getRandomDamagemult);
+
         defender.dealDamage(dmg);
         Console.WriteLine($"{defender.Nickname} took {(int)((float)dmg / (float)defender.stats[HP] * 100)}% damage");
 

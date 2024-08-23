@@ -33,4 +33,6 @@ public static class DamageCalc
         
         return dmg;
     }
+
+    public static float getRandomDamagemult => (float)Helper.rng.Next(85, 101) / 100f;
 }
