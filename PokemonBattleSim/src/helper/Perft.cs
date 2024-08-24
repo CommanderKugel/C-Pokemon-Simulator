@@ -1,6 +1,7 @@
 using static allPokemon;
 using static allMoves;
 using System.Diagnostics;
+using static Stats;
 
 public static class Perft
 {
@@ -31,20 +32,69 @@ public static class Perft
         Console.WriteLine($"time in s: {clock.ElapsedMilliseconds / 1000}");
     }
 
-    private static int randomRollout (Battle b)
-    {
-        Pos pos = b.CurrPos;
+    public static int randomRollout (Battle b)
+    {   
+        Battle bCopy = new Battle(b.Teams[0], b.Teams[1], new RandomTrainer(), new RandomTrainer());
+
+        Pos pos = bCopy.CurrPos;
         if (pos.isGameOver())
             return pos.getGameresult();
 
-        Action actA = b.trainers[0].chooseAction(b, 0);
-        Action actB = b.trainers[1].chooseAction(b, 1);
+        Action actA = bCopy.trainers[0].chooseAction(bCopy, 0);
+        Action actB = bCopy.trainers[1].chooseAction(bCopy, 1);
 
-        b.MakeTurn(actA, actB);
-        int randRes = randomRollout(b);
-        b.goBackTurn();
+        bCopy.MakeTurn(actA, actB);
+        int randRes = randomRollout(bCopy);
+        bCopy.goBackTurn();
 
         return randRes;
+    }
+
+    public static int debugRollout (Battle b)
+    {
+        Pos pos = b.CurrPos;
+
+        if (pos.isGameOver())
+        {
+            int endRes = pos.getGameresult();
+            Console.WriteLine($"Game Over! winner is: {endRes}");
+            return endRes;
+        }
+
+        Console.WriteLine($"\nTurn {b.ply}");
+
+        var pokA = pos.getActivePokeCond(0);
+        var pokB = pos.getActivePokeCond(1);
+        Action actA = b.trainers[0].chooseAction(b, 0);
+        if (actA.isMove)
+            Console.WriteLine($"{(actA as Move).name}: {Types.AttackEffecticityMultiplier((actA as Move), pokA.pokemon)}");
+        Action actB = b.trainers[1].chooseAction(b, 1);
+
+
+
+        if (b.goesFirst(actA.priority, actB.priority, pokA.StatsEffective[Init], pokB.StatsEffective[Init]))
+        {
+            if (actA.isMove) Console.WriteLine($"{pokA.Nickname} uses {(actA as Move).name}");
+            else Console.WriteLine($"{pokA.Nickname} switches out for {(actA as Switch).bankedMon.Nickname}");
+
+            if (actB.isMove) Console.WriteLine($"{pokB.Nickname} uses {(actB as Move).name}");
+            else Console.WriteLine($"{pokB.Nickname} switches out for {(actB as Switch).bankedMon.Nickname}");
+        }
+        else
+        {
+            if (actB.isMove) Console.WriteLine($"{pokB.Nickname} uses {(actB as Move).name}");
+            else Console.WriteLine($"{pokB.Nickname} switches out for {(actB as Switch).bankedMon.Nickname}");
+
+            if (actA.isMove) Console.WriteLine($"{pokA.Nickname} uses {(actA as Move).name}");
+            else Console.WriteLine($"{pokA.Nickname} switches out for {(actA as Switch).bankedMon.Nickname}");
+        }
+        
+
+        b.MakeTurn(actA, actB);
+        int res = debugRollout(b);
+        b.goBackTurn();
+
+        return res;
     }
 
 }

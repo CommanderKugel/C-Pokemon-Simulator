@@ -13,7 +13,10 @@ public class Battle
 
     public Battle(Pokemon[] TeamA, Pokemon[] TeamB, Trainer t1=null, Trainer t2=null)
     {
-        trainers = [t1 is null ? new RandomTrainer() : t1, t2 is null ? new RandomTrainer() : t2];
+        trainers = [
+            t1 == null ? new RandomTrainer() : t1, 
+            t2 == null ? new RandomTrainer() : t2
+        ];
         Teams = [TeamA, TeamB];
         Positions = new Pos[64];
         Positions[0] = new(this);
@@ -145,19 +148,25 @@ public class Battle
         // Faint-check & switch ins if fainted
         if (pokeA.isFainted) 
         {
+            Console.WriteLine($"{pokeA.Nickname} fainted!");
             if (faintCheckAll(0))
                 return;
 
             Switch[] switches = pos.getAllSwitches(0);
-            MakeSwitch(switches[Helper.rng.Next(switches.Length)]);
+            Switch s = switches[Helper.rng.Next(switches.Length)];
+            Console.WriteLine($"{s.bankedMon.Nickname} switches in!");
+            MakeSwitch(s);
         }
         if (pokeB.isFainted) 
         {
+            Console.WriteLine($"{pokeB.Nickname} fainted!");
             if (faintCheckAll(1))
                 return;
 
             Switch[] switches = pos.getAllSwitches(1);
-            MakeSwitch(switches[Helper.rng.Next(switches.Length)]);
+            Switch s = switches[Helper.rng.Next(switches.Length)];
+            Console.WriteLine($"{s.bankedMon.Nickname} switches in!");
+            MakeSwitch(s);
         }
 
         // update if last Action changed Stats

@@ -1,11 +1,3 @@
-using static Stats;
-
-public abstract class Trainer
-{
-    public abstract Action chooseAction(Battle b, int us);
-    public abstract Switch chooseSwitch(Battle b, int us);
-}
-
 public class RandomTrainer : Trainer
 {
     public override Action chooseAction(Battle b, int us)
@@ -24,4 +16,3 @@ public class RandomTrainer : Trainer
         return arr[Helper.rng.Next(arr.Length)];
     }
 }
-

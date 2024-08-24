@@ -10,9 +10,10 @@ public struct Pos
     public Switch[] getAllSwitches(int Team)
     {
         List<Switch> allSwitches = new List<Switch>();
-        foreach (var pc in this.allConditions[Team])
-            if (!pc.isFainted)
-                allSwitches.Add(new Switch(pc, Team));
+        var arr = this.allConditions[Team];
+        for (int i=1; i<arr.Length; i++)
+            if (!arr[i].isFainted)
+                allSwitches.Add(new Switch(arr[i], Team));
         
         return allSwitches.ToArray();
     }
