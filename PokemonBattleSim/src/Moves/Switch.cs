@@ -2,7 +2,6 @@ public class Switch : Action
 {
     public PokeCond bankedMon;
     public int Team;
-    public int priority = 10;
 
     public Switch(PokeCond bankedMon, int Team) : base(false, 10) 
     {

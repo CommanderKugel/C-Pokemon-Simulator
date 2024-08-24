@@ -7,6 +7,7 @@ public class Battle
 
     const int MAX_PLY = 64;
     public int ply;
+    public int nodeCount;
     public Pos CurrPos => this.Positions[ply];
 
     public Battle(Pokemon[] TeamA, Pokemon[] TeamB)
@@ -15,6 +16,7 @@ public class Battle
         Positions = new Pos[64];
         Positions[0] = new(this);
         ply = 0;
+        nodeCount = 0;
     }
 
 
@@ -38,19 +40,13 @@ public class Battle
 
         // check if making the move is even allowed
         if (!attacker.canUseMove(move))
-        {
-            //Console.WriteLine($"{attacker.Nickname} can not use {move.name}!");
             return;
-        }
 
         //Console.WriteLine($"{attacker.Nickname} used {move.name}!");
 
         // try missing the move
         if (canMiss && move.Accuracy < 100 && Helper.rng.Next(0, 100) > move.Accuracy)
-        {
-            //Console.WriteLine("it missed!");
             return;
-        }
 
         // deal the damage if it deals any
         if (move.Category != Category.Status)
@@ -61,14 +57,11 @@ public class Battle
             if (useCritRoll) dmg = (int)(dmg * DamageCalc.getCritRollValue);
             
             defender.dealDamage(dmg);
-            //Console.WriteLine($"{defender.Nickname} took {(int)((float)dmg / (float)defender.stats[HP] * 100)}% damage");
 
             // faint check
             if (defender.isFainted) 
-            {
-                //Console.WriteLine($"{defender.Nickname} fainted!");
                 return;
-            }
+
         }
         
         // damaging moves and status moves can both have effects
@@ -77,21 +70,21 @@ public class Battle
     }
 
 
-    public void MakeSwitch(Switch s, PokeCond active)
+    public void MakeSwitch(Switch s)
     {
         if (s.bankedMon == this.CurrPos.getActivePokemon(s.Team))
-        {
-            //Console.WriteLine($"{active.Nickname} cant switch in, because its alreade in battle!");
             return;
-        }
-        //Console.WriteLine($"{active.Nickname} switched out for {s.bankedMon.Nickname}!");
 
         var arr = CurrPos.allConditions[s.Team];
-        int index = Array.IndexOf(arr, s.bankedMon);
-        (arr[index], arr[0]) = (arr[0], arr[index]);
+        var bankIndex = s.bankedMon.index;
+
+        (arr[bankIndex], arr[0]) = (arr[0], arr[bankIndex]);
+        arr[0].index = 0;
+        arr[bankIndex].index = bankIndex;
 
         // update to remove certain effects
         // e.g. choice-moves, confusion, ...
+        Array.Fill<sbyte>(arr[bankIndex].StatChanges, 0);
     }
 
 
@@ -99,7 +92,7 @@ public class Battle
     public void TakeAction (Action a, PokeCond attacker, PokeCond defender) 
     {
         if (a is Move) MakeMove(a as Move, attacker, defender);
-        else MakeSwitch(a as Switch, attacker);
+        else MakeSwitch(a as Switch);
     }    
 
     public void MakeTurn(PokeCond p, Action actB) => MakeTurn(new Switch(p, 0), actB);
@@ -117,12 +110,11 @@ public class Battle
         // first copy, then make
         Pos pos = new Pos(CurrPos);
         this.ply++;
+        this.nodeCount++;
         Positions[this.ply] = pos;
 
         PokeCond pokeA = pos.getActivePokemon(0);
         PokeCond pokeB = pos.getActivePokemon(1);
-
-        //Console.WriteLine($"\nTurn {ply}");
         
         // determine move order
         bool aGoesFirst = goesFirst(actA.priority, actB.priority, pokeA.StatsEffective[Init], pokeB.StatsEffective[Init]);
@@ -157,20 +149,16 @@ public class Battle
         if (pokeA.isFainted) 
         {
             if (faintCheckAll(0))
-            {
-                //Console.WriteLine("Battle ended! Winner is Team B!");
                 return;
-            }
-            MakeSwitch(new(pos.allConditions[0][1], 0), pokeA);
+
+            MakeSwitch(new(pos.allConditions[0][1], 0));
         }
         if (pokeB.isFainted) 
         {
             if (faintCheckAll(1))
-            {
-                //Console.WriteLine("Battle ended! Winner is Team A!");
                 return;
-            }
-            MakeSwitch(new(pos.allConditions[1][1], 1), pokeB);
+
+            MakeSwitch(new(pos.allConditions[1][1], 1));
         }
     }
 

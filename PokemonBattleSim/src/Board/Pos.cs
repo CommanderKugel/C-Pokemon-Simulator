@@ -7,6 +7,16 @@ public struct Pos
 
     public PokeCond getActivePokemon(int Team) => allConditions[Team][0];
 
+    public Switch[] getAllSwitches(int Team)
+    {
+        List<Switch> allSwitches = new List<Switch>();
+        foreach (var pc in this.allConditions[Team])
+            if (!pc.isFainted)
+                allSwitches.Add(new Switch(pc, Team));
+        
+        return allSwitches.ToArray();
+    }
+
     public Pos(Battle b)
     {
         this.battle = b;
@@ -14,6 +24,12 @@ public struct Pos
             b.Teams[0].Select(x => new PokeCond(x)).ToArray(),
             b.Teams[1].Select(x => new PokeCond(x)).ToArray(),
         ];
+        // set index for all conditions
+        for (byte i=0; i<allConditions[0].Length; i++)
+        {
+            allConditions[0][i].index = i;
+            allConditions[1][i].index = i;
+        }
     }
 
     public Pos(Pos prev)

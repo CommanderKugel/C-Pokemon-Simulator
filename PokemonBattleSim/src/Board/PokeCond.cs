@@ -5,6 +5,7 @@ public class PokeCond
     public readonly Pokemon pokemon;
     public short[] StatsEffective;
     public sbyte[] StatChanges;
+    public byte index;
 
     public PokeCond(Pokemon p)
     {
@@ -20,6 +21,7 @@ public class PokeCond
         StatChanges = new sbyte[6];
         Array.Copy(pc.StatsEffective, this.StatsEffective, 6);
         Array.Copy(pc.StatChanges, this.StatChanges, 6);
+        this.index = pc.index;
     } 
 
     // QUALITY OF LIFE METHODS
@@ -37,7 +39,7 @@ public class PokeCond
 
     public bool moveIsLearned(Move move) => this.pokemon.MoveSet.Contains(move);
     public bool canUseMove(Move move) => this.moveIsLearned(move); // Choice Items Here
-    public bool canMove() => false; // paralysis-, confusion-, flinchcheck here
+    public bool canMove() => true; // paralysis-, confusion-, flinchcheck here
 
 
     public void CalculateStatsEffective() 

@@ -1,3 +1,5 @@
+using static OnHitEffects;
+
 public static class allMoves
 {
     // Easy Moves
@@ -7,8 +9,12 @@ public static class allMoves
 
     // ToDo Moves
     public static Move Flamethrower = new("Flamethrower", Category.Special, PType.Fire, 90);
-    public static Move Shadowball = new("Shadow Ball", Category.Special, PType.Ghost, 80);
+    public static Move Thunderbolt = new("Thunderbolt", Category.Special, PType.Electric, 90);
+    public static Move Bodyslam = new("Bodyslyam", Category.Physical, PType.Normal, 85);
+
+    // Stat-Lowering Moves
+    public static Move Shadowball = new("Shadow Ball", Category.Special, PType.Ghost, 80, OnHitEffAct: lowerDefendersSpD, OnHitChance: 20);
 
     // Status Moves
-    public static Move Swordsdance = new("Swords Dance", Category.Status, PType.Normal, OnHitEffAct: OnHitEffects.raiseAttackTwice);
+    public static Move Swordsdance = new("Swords Dance", Category.Status, PType.Normal, OnHitEffAct: raiseAttackTwice);
 }

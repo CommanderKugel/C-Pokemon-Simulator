@@ -6,14 +6,15 @@ public class Move : Action
     public readonly Category Category;
     public readonly PType Type;
 
-    public readonly int Accuracy;
     public readonly int Power;
+    public readonly int Accuracy;
+    public readonly int OnHitChance;
 
     private readonly Func<Move, PokeCond, PokeCond, int> CalcDmgFunc;
     public int CalcDmg(PokeCond att, PokeCond def) => this.CalcDmgFunc(this, att, def);
 
-    private readonly Action<PokeCond, PokeCond> OnHitEffAct;
-    public void OnHitEffect(PokeCond attacker, PokeCond defender) => this.OnHitEffAct(attacker, defender);
+    private readonly Action<PokeCond, PokeCond, int> OnHitEffAct;
+    public void OnHitEffect(PokeCond attacker, PokeCond defender) => this.OnHitEffAct(attacker, defender, this.OnHitChance);
  
     public Move (
         string name,
@@ -21,9 +22,10 @@ public class Move : Action
         PType Type, 
         int Power = 0, 
         int Accuracy = 100, 
+        int OnHitChance = 100,
         Func<Move, PokeCond, PokeCond, int> CalcDmgFunc = null,
         int Priority = 0,
-        Action<PokeCond, PokeCond> OnHitEffAct = null
+        Action<PokeCond, PokeCond, int> OnHitEffAct = null
     ) 
     : base(true, Priority) 
     {
