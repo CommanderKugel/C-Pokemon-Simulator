@@ -7,24 +7,37 @@ public class Battle
 
     const int MAX_PLY = 64;
     public int ply;
-    public Pos CurrPos => Positions[ply];
+    public Pos CurrPos => this.Positions[ply];
 
     public Battle(Pokemon[] TeamA, Pokemon[] TeamB)
     {
-        Teams = new Pokemon[][] { TeamA, TeamB };
+        Teams = [TeamA, TeamB];
         Positions = new Pos[64];
         Positions[0] = new(this);
         ply = 0;
     }
 
 
-    public void MakeSingleMove (
+    public bool faintCheckAll(int Team)
+    {
+        foreach (var pc in CurrPos.allConditions[Team])
+            if (!pc.isFainted) return false;
+        return true;
+    }
+
+
+    public void MakeMove(
         Move move, PokeCond attacker, PokeCond defender,
         bool useRandomRanges=true,
         bool useCritRoll=true,
         bool canMiss=true
     ) {
-        if (attacker.isFainted || !attacker.canUseMove(move))
+        
+        // Faint check
+        if (attacker.isFainted) return;
+
+        // check if making the move is even allowed
+        if (!attacker.canUseMove(move))
         {
             Console.WriteLine($"{attacker.Nickname} can not use {move.name}!");
             return;
@@ -32,12 +45,14 @@ public class Battle
 
         Console.WriteLine($"{attacker.Nickname} used {move.name}!");
 
+        // try missing the move
         if (canMiss && move.Accuracy < 100 && Helper.rng.Next(0, 100) > move.Accuracy)
         {
             Console.WriteLine("it missed!");
             return;
         }
 
+        // deal the damage if it deals any
         if (move.Category != Category.Status)
         {
             // damaging part
@@ -74,8 +89,6 @@ public class Battle
         var arr = CurrPos.allConditions[s.Team];
         int index = Array.IndexOf(arr, s.bankedMon);
         (arr[index], arr[0]) = (arr[0], arr[index]);
-        active = s.bankedMon;
-
 
         // update to remove certain effects
         // e.g. choice-moves, confusion, ...
@@ -85,7 +98,7 @@ public class Battle
 
     public void TakeAction (Action a, PokeCond attacker, PokeCond defender) 
     {
-        if (a is Move) MakeSingleMove(a as Move, attacker, defender);
+        if (a is Move) MakeMove(a as Move, attacker, defender);
         else MakeSwitch(a as Switch, attacker);
     }    
 
@@ -95,7 +108,17 @@ public class Battle
 
     public void MakeTurn(Action actA, Action actB)
     {
-        Pos pos = CurrPos;
+        if (this.ply >= MAX_PLY) 
+        {
+            Console.WriteLine("Max ply from root reached!");
+            throw null;
+        }
+
+        // first copy, then make
+        Pos pos = new Pos(CurrPos);
+        this.ply++;
+        Positions[this.ply] = pos;
+
         PokeCond pokeA = pos.getActivePokemon(0);
         PokeCond pokeB = pos.getActivePokemon(1);
 
@@ -131,15 +154,24 @@ public class Battle
         pokeB.CalculateStatsEffective();
 
         // Faint-check & switch ins
-        if (pokeA.isFainted) MakeSwitch(new(pos.allConditions[0][1], 0), pokeA);
-        if (pokeB.isFainted) MakeSwitch(new(pos.allConditions[1][1], 1), pokeB);
-
-        // update boardstate
-        this.ply++;
-        Pos newPos = new Pos(pos);
-        Positions[this.ply] = newPos;
-
-        Console.WriteLine($"{pokeA.Nickname} vs. {pokeB.Nickname}");
+        if (pokeA.isFainted) 
+        {
+            if (faintCheckAll(0))
+            {
+                Console.WriteLine("Battle ended! Winner is Team B!");
+                return;
+            }
+            MakeSwitch(new(pos.allConditions[0][1], 0), pokeA);
+        }
+        if (pokeB.isFainted) 
+        {
+            if (faintCheckAll(1))
+            {
+                Console.WriteLine("Battle ended! Winner is Team A!");
+                return;
+            }
+            MakeSwitch(new(pos.allConditions[1][1], 1), pokeB);
+        }
     }
 
     public bool goesFirst (int prioA, int prioB, int initA, int initB)
@@ -147,5 +179,13 @@ public class Battle
         if (prioA != prioB) return prioA > prioB;
         if (initA != initB) return initA > initB;
         return Helper.rng.Next(0, 2) == 0;
+    }
+
+    public void goBackTurn() 
+    {
+        this.CurrPos.print();
+        this.Positions[this.ply] = Pos.emptyPos;
+        this.ply--;
+        this.CurrPos.print();
     }
 }

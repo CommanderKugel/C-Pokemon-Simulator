@@ -7,6 +7,9 @@ Pokemon[] TeamB = [MyHeatran, MyGengar];
 Battle b = new Battle(TeamA, TeamB);
 
 var cloyCond = b.CurrPos.allConditions[0][1];
-b.MakeTurn(cloyCond, Flamethrower);
 
-Console.WriteLine($"active mon A: {b.CurrPos.getActivePokemon(0).Nickname}");
+b.CurrPos.print();
+
+b.MakeTurn(Earthquake, Flamethrower);
+
+b.goBackTurn();
