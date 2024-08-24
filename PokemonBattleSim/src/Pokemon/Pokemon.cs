@@ -13,7 +13,7 @@ public class Pokemon
     public readonly short[] stats;
     public readonly byte[] EVs;
 
-    public Move[] MoveSet;
+    public readonly Move[] MoveSet;
 
 
     public Pokemon(

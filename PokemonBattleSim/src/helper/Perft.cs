@@ -18,7 +18,7 @@ public static class Perft
         clock.Start();
 
         for (int i=0; i<numGames; i++)
-            resSum += randomRollout(b);
+            resSum += doRandomRollout(b);
         
         clock.Stop();
 
@@ -32,20 +32,28 @@ public static class Perft
         Console.WriteLine($"time in s: {clock.ElapsedMilliseconds / 1000}");
     }
 
-    public static int randomRollout (Battle b)
-    {   
-        Battle bCopy = new Battle(b.Teams[0], b.Teams[1], new RandomTrainer(), new RandomTrainer());
 
-        Pos pos = bCopy.CurrPos;
+    public static int doRandomRollout (Battle b)
+    {
+        Battle bCopy = new Battle(b.Teams[0], b.Teams[1], new RandomTrainer(), new RandomTrainer());
+        return randomRollout(bCopy, 500);
+    }
+
+    private static int randomRollout (Battle b, int depth)
+    {   
+        if (depth <= 0)
+            return 0;
+
+        Pos pos = b.CurrPos;
         if (pos.isGameOver())
             return pos.getGameresult();
 
-        Action actA = bCopy.trainers[0].chooseAction(bCopy, 0);
-        Action actB = bCopy.trainers[1].chooseAction(bCopy, 1);
+        Action actA = b.trainers[0].chooseAction(b, 0);
+        Action actB = b.trainers[1].chooseAction(b, 1);
 
-        bCopy.MakeTurn(actA, actB);
-        int randRes = randomRollout(bCopy);
-        bCopy.goBackTurn();
+        b.MakeTurn(actA, actB);
+        int randRes = randomRollout(b, depth-1);
+        b.goBackTurn();
 
         return randRes;
     }
@@ -66,11 +74,8 @@ public static class Perft
         var pokA = pos.getActivePokeCond(0);
         var pokB = pos.getActivePokeCond(1);
         Action actA = b.trainers[0].chooseAction(b, 0);
-        if (actA.isMove)
-            Console.WriteLine($"{(actA as Move).name}: {Types.AttackEffecticityMultiplier((actA as Move), pokA.pokemon)}");
         Action actB = b.trainers[1].chooseAction(b, 1);
-
-
+        
 
         if (b.goesFirst(actA.priority, actB.priority, pokA.StatsEffective[Init], pokB.StatsEffective[Init]))
         {

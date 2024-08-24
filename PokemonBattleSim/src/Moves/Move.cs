@@ -10,6 +10,8 @@ public class Move : Action
     public readonly int Accuracy;
     public readonly int OnHitChance;
 
+    public bool misses => Accuracy < 100 && Helper.rng.Next(0, 100) > Accuracy;
+
     private readonly Func<Move, PokeCond, PokeCond, int> CalcDmgFunc;
     public int CalcDmg(PokeCond att, PokeCond def) => this.CalcDmgFunc(this, att, def);
 
@@ -37,6 +39,8 @@ public class Move : Action
         this.CalcDmgFunc = CalcDmgFunc is null ? DamageCalc.CalculateRawDamage : CalcDmgFunc;
         this.OnHitEffAct = OnHitEffAct is null ? OnHitEffects.NoEffect : OnHitEffAct;
     }
+
+    public override string ToString() => this.name;
 
 }
 
