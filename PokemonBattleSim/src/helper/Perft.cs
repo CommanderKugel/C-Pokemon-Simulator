@@ -8,31 +8,43 @@ public static class Perft
     {
         Pokemon[] TeamA = [MyGarchomp, MyCloister, MyZapdos];
         Pokemon[] TeamB = [MyHeatran, MyGengar, MySnorlax];
+        // not specifying trainers creates two randomTrainers
         Battle b = new Battle(TeamA, TeamB);
 
         var clock = new Stopwatch();
+        int resSum = 0;
+        int numGames = 1_000_000;
         clock.Start();
-        for (int i=0; i<10_000_000; i++)
-        {
-            var actA = getRandomAction(0, b.CurrPos);
-            var actB = getRandomAction(1, b.CurrPos);
-            b.MakeTurn(actA, actB);
-            b.goBackTurn();
-        }
+
+        for (int i=0; i<numGames; i++)
+            resSum += randomRollout(b);
+        
         clock.Stop();
+
+        Console.WriteLine($"games played: {numGames}");
+        Console.WriteLine($"total turns played: {b.nodeCount}");
+        Console.WriteLine($"avrg. turns per game: {b.nodeCount/numGames}");
+        Console.WriteLine($"avrg winner: {(float)resSum / (float)numGames}");
 
         float nps = b.nodeCount / clock.ElapsedMilliseconds * 1000;
         Console.WriteLine($"nps: {nps}");
-        Console.WriteLine($"time: {clock.Elapsed}");
+        Console.WriteLine($"time in s: {clock.ElapsedMilliseconds / 1000}");
     }
 
-    private static Action getRandomAction(int Team, Pos pos)
+    private static int randomRollout (Battle b)
     {
-        var moves = pos.getActivePokemon(Team).Moveset;
-        var switches = pos.getAllSwitches(Team);
-        
-        int index = Helper.rng.Next(moves.Length + switches.Length);
-        return index < moves.Length ? moves[index] : switches[index - moves.Length];
+        Pos pos = b.CurrPos;
+        if (pos.isGameOver())
+            return pos.getGameresult();
+
+        Action actA = b.trainers[0].chooseAction(b, 0);
+        Action actB = b.trainers[1].chooseAction(b, 1);
+
+        b.MakeTurn(actA, actB);
+        int randRes = randomRollout(b);
+        b.goBackTurn();
+
+        return randRes;
     }
 
 }

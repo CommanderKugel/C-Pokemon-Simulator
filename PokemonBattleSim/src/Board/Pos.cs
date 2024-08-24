@@ -5,7 +5,7 @@ public struct Pos
     public Battle battle;
     public PokeCond[][] allConditions;
 
-    public PokeCond getActivePokemon(int Team) => allConditions[Team][0];
+    public PokeCond getActivePokeCond(int Team) => allConditions[Team][0];
 
     public Switch[] getAllSwitches(int Team)
     {
@@ -16,6 +16,27 @@ public struct Pos
         
         return allSwitches.ToArray();
     }
+
+
+    public bool isGameOver() => battle.ply == Battle.MAX_PLY || TeamHasFainted(0) || TeamHasFainted(1);
+    
+    public int getGameresult() 
+    {
+        bool faintA = getActivePokeCond(0).isFainted;
+        bool faintB = getActivePokeCond(1).isFainted;
+        if (faintA) return -1;
+        if (faintB && !faintA) return 1;
+        return 0;
+    }
+
+    public bool TeamHasFainted(int Team)
+    {
+        foreach (var pc in this.allConditions[Team])
+            if (!pc.isFainted)
+                return false;
+        return true;
+    }
+
 
     public Pos(Battle b)
     {
@@ -54,8 +75,8 @@ public struct Pos
 
     public void print()
     {
-        var pA = getActivePokemon(0);
-        var pB = getActivePokemon(1);
+        var pA = getActivePokeCond(0);
+        var pB = getActivePokeCond(1);
         Console.WriteLine($"active A: {pA.Nickname}, B: {pB.Nickname}");
         Console.WriteLine($"\tHP A: {pA.StatsEffective[HP]}, B: {pB.StatsEffective[HP]}");
     }

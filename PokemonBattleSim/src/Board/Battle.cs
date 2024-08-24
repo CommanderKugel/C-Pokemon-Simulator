@@ -2,16 +2,18 @@ using static Stats;
 
 public class Battle
 {
+    public Trainer[] trainers;
     public Pokemon[][] Teams;
     public Pos[] Positions;
 
-    const int MAX_PLY = 64;
+    public const int MAX_PLY = 64;
     public int ply;
     public int nodeCount;
     public Pos CurrPos => this.Positions[ply];
 
-    public Battle(Pokemon[] TeamA, Pokemon[] TeamB)
+    public Battle(Pokemon[] TeamA, Pokemon[] TeamB, Trainer t1=null, Trainer t2=null)
     {
+        trainers = [t1 is null ? new RandomTrainer() : t1, t2 is null ? new RandomTrainer() : t2];
         Teams = [TeamA, TeamB];
         Positions = new Pos[64];
         Positions[0] = new(this);
@@ -72,7 +74,7 @@ public class Battle
 
     public void MakeSwitch(Switch s)
     {
-        if (s.bankedMon == this.CurrPos.getActivePokemon(s.Team))
+        if (s.bankedMon == this.CurrPos.getActivePokeCond(s.Team))
             return;
 
         var arr = CurrPos.allConditions[s.Team];
@@ -101,10 +103,9 @@ public class Battle
 
     public void MakeTurn(Action actA, Action actB)
     {
-        if (this.ply >= MAX_PLY) 
+        if (this.ply >= MAX_PLY-1) 
         {
-            //Console.WriteLine("Max ply from root reached!");
-            throw null;
+            throw new Exception("Game took too long and exceeded the Ply-limit!");
         }
 
         // first copy, then make
@@ -113,8 +114,8 @@ public class Battle
         this.nodeCount++;
         Positions[this.ply] = pos;
 
-        PokeCond pokeA = pos.getActivePokemon(0);
-        PokeCond pokeB = pos.getActivePokemon(1);
+        PokeCond pokeA = pos.getActivePokeCond(0);
+        PokeCond pokeB = pos.getActivePokeCond(1);
         
         // determine move order
         bool aGoesFirst = goesFirst(actA.priority, actB.priority, pokeA.StatsEffective[Init], pokeB.StatsEffective[Init]);
@@ -123,43 +124,46 @@ public class Battle
         if (aGoesFirst)
         {
             TakeAction(actA, pokeA, pokeB);
-            pokeA = pos.getActivePokemon(0);
+            pokeA = pos.getActivePokeCond(0);
 
-            if (pokeB == pos.getActivePokemon(1))
+            if (pokeB == pos.getActivePokeCond(1))
                 TakeAction(actB, pokeB, pokeA);
             else
-                pokeB = pos.getActivePokemon(1);
+                pokeB = pos.getActivePokeCond(1);
         } 
         else 
         {
             TakeAction(actB, pokeB, pokeA);
-            pokeB = pos.getActivePokemon(1);
+            pokeB = pos.getActivePokeCond(1);
 
-            if (pokeA == pos.getActivePokemon(0))
+            if (pokeA == pos.getActivePokeCond(0))
                 TakeAction(actA, pokeA, pokeB);
             else
-                pokeA = pos.getActivePokemon(0);
+                pokeA = pos.getActivePokeCond(0);
         }
 
-        // update if last Action changed Stats
-        pokeA.CalculateStatsEffective();
-        pokeB.CalculateStatsEffective();
-
-        // Faint-check & switch ins
+        // Faint-check & switch ins if fainted
         if (pokeA.isFainted) 
         {
             if (faintCheckAll(0))
                 return;
 
-            MakeSwitch(new(pos.allConditions[0][1], 0));
+            Switch[] switches = pos.getAllSwitches(0);
+            MakeSwitch(switches[Helper.rng.Next(switches.Length)]);
         }
         if (pokeB.isFainted) 
         {
             if (faintCheckAll(1))
                 return;
 
-            MakeSwitch(new(pos.allConditions[1][1], 1));
+            Switch[] switches = pos.getAllSwitches(1);
+            MakeSwitch(switches[Helper.rng.Next(switches.Length)]);
         }
+
+        // update if last Action changed Stats
+        // or switched pokemon changes Stats, e.g. via Intimidate
+        pokeA.CalculateStatsEffective();
+        pokeB.CalculateStatsEffective();
     }
 
     public bool goesFirst (int prioA, int prioB, int initA, int initB)
