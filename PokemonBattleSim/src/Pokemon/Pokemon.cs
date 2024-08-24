@@ -10,7 +10,7 @@ public class Pokemon
     public readonly PType SecType;
 
     public readonly Nature nat;
-    public readonly int[] stats;
+    public readonly short[] stats;
     public readonly byte[] EVs;
 
     public Move[] MoveSet;

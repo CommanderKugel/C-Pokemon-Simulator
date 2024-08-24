@@ -10,11 +10,11 @@ public static class Stats
                    Init = 5;
 
 
-    public static int[] calculate_stats(
+    public static short[] calculate_stats(
         int lvl, int[] BaseStats, byte[] EVs,
         Nature nat
     ) {
-        return new int[] {
+        return new short[] {
             CalcHP(lvl, BaseStats[HP], EVs[HP]),
             CalcStat(Natures.GetNatMult(Atk, nat), lvl, BaseStats[Atk], EVs[Atk]),
             CalcStat(Natures.GetNatMult(Def, nat), lvl, BaseStats[Def], EVs[Def]),
@@ -24,16 +24,16 @@ public static class Stats
         };
     }
 
-    public static int CalcHP(int lvl, int BaseStat, int EV) 
+    public static short CalcHP(int lvl, int BaseStat, int EV) 
     {
         const int IV = 31;
-        return (BaseStat * 2 + IV + EV / 4) * lvl / 100 + lvl + 10;
+        return (short)((BaseStat * 2 + IV + EV / 4) * lvl / 100 + lvl + 10);
     }
 
-    public static int CalcStat(float NatMult, int lvl, int BaseStat, int EV) {
+    public static short CalcStat(float NatMult, int lvl, int BaseStat, int EV) 
+    {
         const int IV = 31;
-
-        return (int)(((2 * BaseStat + IV + EV / 4) * lvl / 100 + 5) * NatMult);
+        return (short)(((2 * BaseStat + IV + EV / 4) * lvl / 100 + 5) * NatMult);
     }
 
     public static float GetStatChangeMult (int x) => StatChangeMult[x + 6];

@@ -19,9 +19,18 @@ public struct Pos
     public Pos(Pos prev)
     {
         this.battle = prev.battle;
-        allConditions = prev.allConditions.Select(
-            arr => arr.Select(x => new PokeCond(x)).ToArray()
-        ).ToArray();
+        int l = prev.allConditions[0].Length;
+        
+        allConditions = [
+            new PokeCond[l], 
+            new PokeCond[l]
+        ];
+
+        for (int i=0; i<l; i++)
+        {
+            allConditions[0][i] = new(prev.allConditions[0][i]);
+            allConditions[1][i] = new(prev.allConditions[1][i]);
+        }
     }
 
     public Pos() {}

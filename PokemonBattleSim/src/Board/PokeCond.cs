@@ -3,7 +3,7 @@ using static Stats;
 public class PokeCond
 {
     public readonly Pokemon pokemon;
-    public int[] StatsEffective;
+    public short[] StatsEffective;
     public sbyte[] StatChanges;
 
     public PokeCond(Pokemon p)
@@ -16,8 +16,10 @@ public class PokeCond
     public PokeCond(PokeCond pc) 
     {
         pokemon = pc.pokemon;
-        StatsEffective = pc.StatsEffective.ToArray();
-        StatChanges = pc.StatChanges.ToArray();
+        StatsEffective = new short[6];
+        StatChanges = new sbyte[6];
+        Array.Copy(pc.StatsEffective, this.StatsEffective, 6);
+        Array.Copy(pc.StatChanges, this.StatChanges, 6);
     } 
 
     // QUALITY OF LIFE METHODS
@@ -26,12 +28,12 @@ public class PokeCond
     public int Level => this.pokemon.Level;
     public PType PrimType => this.pokemon.PrimType;
     public PType SecType => this.pokemon.SecType;
-    public int[] stats => this.pokemon.stats;
+    public short[] stats => this.pokemon.stats;
     public Move[] Moveset => this.pokemon.MoveSet;
 
     // QUALITY IF LIFE METHODS THAT ARE NOT PLAIN REFERENCES
     public bool isFainted => StatsEffective[HP] <= 0;
-    public void dealDamage(int dmg) => this.StatsEffective[HP] = Math.Max(this.StatsEffective[HP] - dmg, 0);
+    public void dealDamage(int dmg) => this.StatsEffective[HP] = (short) Math.Max(this.StatsEffective[HP] - dmg, 0);
 
     public bool moveIsLearned(Move move) => this.pokemon.MoveSet.Contains(move);
     public bool canUseMove(Move move) => this.moveIsLearned(move); // Choice Items Here
@@ -43,7 +45,7 @@ public class PokeCond
         for (int i=Atk; i<=Init; i++)
         {
             float mult = GetStatChangeMult(StatChanges[i]);
-            StatsEffective[i] = (int)(pokemon.stats[i] * mult);
+            StatsEffective[i] = (short)(pokemon.stats[i] * mult);
         }
     }
 

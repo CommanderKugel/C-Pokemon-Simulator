@@ -39,16 +39,16 @@ public class Battle
         // check if making the move is even allowed
         if (!attacker.canUseMove(move))
         {
-            Console.WriteLine($"{attacker.Nickname} can not use {move.name}!");
+            //Console.WriteLine($"{attacker.Nickname} can not use {move.name}!");
             return;
         }
 
-        Console.WriteLine($"{attacker.Nickname} used {move.name}!");
+        //Console.WriteLine($"{attacker.Nickname} used {move.name}!");
 
         // try missing the move
         if (canMiss && move.Accuracy < 100 && Helper.rng.Next(0, 100) > move.Accuracy)
         {
-            Console.WriteLine("it missed!");
+            //Console.WriteLine("it missed!");
             return;
         }
 
@@ -61,12 +61,12 @@ public class Battle
             if (useCritRoll) dmg = (int)(dmg * DamageCalc.getCritRollValue);
             
             defender.dealDamage(dmg);
-            Console.WriteLine($"{defender.Nickname} took {(int)((float)dmg / (float)defender.stats[HP] * 100)}% damage");
+            //Console.WriteLine($"{defender.Nickname} took {(int)((float)dmg / (float)defender.stats[HP] * 100)}% damage");
 
             // faint check
             if (defender.isFainted) 
             {
-                Console.WriteLine($"{defender.Nickname} fainted!");
+                //Console.WriteLine($"{defender.Nickname} fainted!");
                 return;
             }
         }
@@ -81,10 +81,10 @@ public class Battle
     {
         if (s.bankedMon == this.CurrPos.getActivePokemon(s.Team))
         {
-            Console.WriteLine($"{active.Nickname} cant switch in, because its alreade in battle!");
+            //Console.WriteLine($"{active.Nickname} cant switch in, because its alreade in battle!");
             return;
         }
-        Console.WriteLine($"{active.Nickname} switched out for {s.bankedMon.Nickname}!");
+        //Console.WriteLine($"{active.Nickname} switched out for {s.bankedMon.Nickname}!");
 
         var arr = CurrPos.allConditions[s.Team];
         int index = Array.IndexOf(arr, s.bankedMon);
@@ -110,7 +110,7 @@ public class Battle
     {
         if (this.ply >= MAX_PLY) 
         {
-            Console.WriteLine("Max ply from root reached!");
+            //Console.WriteLine("Max ply from root reached!");
             throw null;
         }
 
@@ -122,7 +122,7 @@ public class Battle
         PokeCond pokeA = pos.getActivePokemon(0);
         PokeCond pokeB = pos.getActivePokemon(1);
 
-        Console.WriteLine($"\nTurn {ply}");
+        //Console.WriteLine($"\nTurn {ply}");
         
         // determine move order
         bool aGoesFirst = goesFirst(actA.priority, actB.priority, pokeA.StatsEffective[Init], pokeB.StatsEffective[Init]);
@@ -158,7 +158,7 @@ public class Battle
         {
             if (faintCheckAll(0))
             {
-                Console.WriteLine("Battle ended! Winner is Team B!");
+                //Console.WriteLine("Battle ended! Winner is Team B!");
                 return;
             }
             MakeSwitch(new(pos.allConditions[0][1], 0), pokeA);
@@ -167,7 +167,7 @@ public class Battle
         {
             if (faintCheckAll(1))
             {
-                Console.WriteLine("Battle ended! Winner is Team A!");
+                //Console.WriteLine("Battle ended! Winner is Team A!");
                 return;
             }
             MakeSwitch(new(pos.allConditions[1][1], 1), pokeB);
@@ -183,9 +183,7 @@ public class Battle
 
     public void goBackTurn() 
     {
-        this.CurrPos.print();
         this.Positions[this.ply] = Pos.emptyPos;
         this.ply--;
-        this.CurrPos.print();
     }
 }
