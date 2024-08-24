@@ -2,9 +2,11 @@
 using static allPokemon;
 using static allMoves;
 
-Pokemon[] TeamA = new Pokemon[] { MyGarchomp };
-Pokemon[] TeamB = new Pokemon[] { MyHeatran };
+Pokemon[] TeamA = [MyGarchomp, MyCloister];
+Pokemon[] TeamB = [MyHeatran, MyGengar];
 Battle b = new Battle(TeamA, TeamB);
 
-b.MakeTurn(Swordsdance, Flamethrower);
-b.MakeTurn(Earthquake, Flamethrower);
+var cloyCond = b.CurrPos.allConditions[0][1];
+b.MakeTurn(cloyCond, Flamethrower);
+
+Console.WriteLine($"active mon A: {b.CurrPos.getActivePokemon(0).Nickname}");
