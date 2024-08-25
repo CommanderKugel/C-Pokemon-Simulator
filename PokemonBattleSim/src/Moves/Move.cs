@@ -8,11 +8,17 @@ public class Move : Action
 
     public readonly int Power;
     public readonly int Accuracy;
+    public readonly int critChance;
 
     public bool misses => Accuracy < 100 && Helper.rng.Next(0, 100) > Accuracy;
 
     private readonly Func<Move, PokeCond, PokeCond, int> CalcDmgFunc;
     public int CalcDmg(PokeCond att, PokeCond def) => this.CalcDmgFunc(this, att, def);
+
+    public float getRandomRollvalue() => (float)Helper.rng.Next(85, 101) / 100f; 
+
+    public bool isCrit() => Helper.rng.Next(0, 16) < this.critChance;
+    
 
     public readonly int OnHitChance;
     private readonly Action<PokeCond, PokeCond> OnHitEffAct;
@@ -31,7 +37,8 @@ public class Move : Action
         int OnHitChance = 100,
         Func<Move, PokeCond, PokeCond, int> CalcDmgFunc = null,
         int Priority = 0,
-        Action<PokeCond, PokeCond> OnHitEffAct = null
+        Action<PokeCond, PokeCond> OnHitEffAct = null,
+        int critChance = 1
     ) 
     : base(true, Priority) 
     {
@@ -43,6 +50,7 @@ public class Move : Action
         this.Power = Power;
         this.CalcDmgFunc = CalcDmgFunc is null ? DamageCalc.CalculateRawDamage : CalcDmgFunc;
         this.OnHitEffAct = OnHitEffAct is null ? OnHitEffects.NoEffect : OnHitEffAct;
+        this.critChance = critChance;
     }
 
     public override string ToString() => this.name;

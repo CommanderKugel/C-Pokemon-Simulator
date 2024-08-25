@@ -33,7 +33,4 @@ public static class DamageCalc
         
         return dmg;
     }
-
-    public static float getRandomRollvalue => (float)Helper.rng.Next(85, 101) / 100f; // includes 85, includes 100, excludes 101 => 16 different rolls
-    public static float getCritRollValue => Helper.rng.Next(0, 16) == 0 ? 1.5f : 1.0f;
 }

@@ -80,8 +80,8 @@ public class Battle
         {
             // damaging part
             int dmg = move.CalcDmg(attacker, defender);
-            if (useRandomRanges) dmg = (int)(dmg * DamageCalc.getRandomRollvalue);
-            if (useCritRoll) dmg = (int)(dmg * DamageCalc.getCritRollValue);
+            if (useRandomRanges) dmg = (int)(dmg * move.getRandomRollvalue());
+            if (useCritRoll && move.isCrit()) dmg = (int)(dmg * 1.5);
             
             defender.dealDamage(dmg);
 
@@ -331,11 +331,13 @@ public class Battle
         {
             // damaging part
             int dmg = move.CalcDmg(attacker, defender);
-            if (useRandomRanges) dmg = (int)(dmg * DamageCalc.getRandomRollvalue);
-            if (useCritRoll && Helper.rng.Next(16) == 0)
+            if (useRandomRanges) 
+                dmg = (int)(dmg * move.getRandomRollvalue());
+
+            if (useCritRoll && move.isCrit())
             {
                 Console.WriteLine("A critical hit!");
-                dmg = (int)(dmg * DamageCalc.getCritRollValue);
+                dmg = (int)(dmg * 1.5);
             }
             
             defender.dealDamage(dmg);
