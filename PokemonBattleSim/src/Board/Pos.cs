@@ -21,12 +21,16 @@ public struct Pos
 
     public bool isGameOver() => battle.ply == Battle.MAX_PLY || TeamHasFainted(0) || TeamHasFainted(1);
     
-    public int getGameresult() 
+    public int getGameResult() 
     {
-        bool faintA = getActivePokeCond(0).isFainted;
-        bool faintB = getActivePokeCond(1).isFainted;
+        if (battle.ply == Battle.MAX_PLY)
+            return 0;
+
+        bool faintA = TeamHasFainted(0);
+        bool faintB = TeamHasFainted(1);
+
         if (faintA) return -1;
-        if (faintB && !faintA) return 1;
+        if (faintB) return  1;
         return 0;
     }
 

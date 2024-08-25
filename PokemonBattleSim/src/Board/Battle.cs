@@ -36,7 +36,7 @@ public class Battle
         this.ply = 0;
         this.nodeCount = 0;
     }
-    public void copyFromParent(Battle parent)
+    public void copyPosFromParent(Battle parent)
     {
         this.Positions[0] = parent.CurrPos;
         this.ply = 0;
@@ -57,9 +57,10 @@ public class Battle
 
     public void MakeMove(
         Move move, PokeCond attacker, PokeCond defender,
+        bool useOnHitEffects=true,
         bool useRandomRanges=true,
         bool useCritRoll=true,
-        bool canMiss=true
+        bool useMisses=true
     ) {
         
         // Faint check
@@ -70,7 +71,7 @@ public class Battle
             return;
 
         // try missing the move
-        if (canMiss && move.misses)
+        if (useMisses && move.misses)
             return;
 
         // deal the damage if the move deals any
@@ -88,9 +89,12 @@ public class Battle
                 return;
 
         }
-        
+            
         // damaging moves and status moves can both have effects
-        move.OnHitEffect(attacker, defender);
+        if (useOnHitEffects)
+        {
+            move.OnHitEffect(attacker, defender);
+        }
     }
 
 
@@ -201,8 +205,13 @@ public class Battle
     }
 
 
-    // HELPER METHOD FOR DEBUGGING
-    public void MakeTurnAndWrite(Action actA, Action actB)
+
+    /*
+        Methods that should not be available to the user
+        they print to the command line and that might interfere with pygame-communication
+    */
+
+    protected void MakeTurnAndWrite(Action actA, Action actB)
     {
         if (this.ply >= MAX_PLY-1)
         {
@@ -287,7 +296,7 @@ public class Battle
     }
 
 
-    public void MakeMoveAndWrite (
+    protected void MakeMoveAndWrite (
         Move move, PokeCond attacker, PokeCond defender,
         bool useRandomRanges=true,
         bool useCritRoll=true,
@@ -332,17 +341,15 @@ public class Battle
                 Console.WriteLine($"{defender} fainted!");
                 return;
             }
-
         }
         
         // damaging moves and status moves can both have effects
         move.OnHitEffect(attacker, defender);
     }
 
-    public void TakeActionAndWrite (Action a, PokeCond attacker, PokeCond defender) 
+    protected void TakeActionAndWrite (Action a, PokeCond attacker, PokeCond defender) 
     {
         if (a is Move) MakeMoveAndWrite(a as Move, attacker, defender);
         else MakeSwitch(a as Switch);
     }   
-
 }

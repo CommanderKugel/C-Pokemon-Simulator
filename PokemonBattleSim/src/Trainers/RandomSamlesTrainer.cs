@@ -1,13 +1,15 @@
 public class RandomSamlesTrainer : Trainer
 {
+    Random rng = new Random();
+
     public override Action chooseAction(Battle b, int us)
     {
+        var pos = b.CurrPos;
+        var ourActions   = getAllActions(pos, us);
+        var theirActions = getAllActions(pos, us ^ 1);
 
         int bestScore = -1000;
-        Action bestAction = default;
-
-        var ourActions = getAllActions(b, us);
-        var theirActions = getAllActions(b, us ^ 1);
+        Action bestAction = null;
 
         foreach (Action actA in ourActions)
         {
@@ -16,10 +18,8 @@ public class RandomSamlesTrainer : Trainer
             foreach (Action actB in theirActions)
             {
                 b.MakeTurn(actA, actB);
-
-                for (int i=0; i<10; i++) 
-                    score += Perft.doRandomRollout(b);
-
+                for (int i=0; i<100; i++) 
+                    score += randomRollout(new Battle(b));
                 b.goBackTurn();
             }
 
@@ -33,25 +33,29 @@ public class RandomSamlesTrainer : Trainer
         return bestAction;
     }
 
-    private Action[] getAllActions(Battle b, int Team)
+    private Action[] getAllActions(Pos p, int us) => [.. p.getActivePokeCond(us).Moveset, .. p.getAllSwitches(us)];
+
+    private int randomRollout (Battle b)
     {
-        var mon = b.CurrPos.getActivePokeCond(Team);
-        var moves = mon.Moveset;
-        var switches = b.CurrPos.getAllSwitches(Team);
+        Pos p = b.CurrPos;
+        if (p.isGameOver())
+            return p.getGameResult();
 
-        Action[] allActions = new Action[moves.Length + switches.Length];
-
-        for (int i=0; i<moves.Length; i++)
-            allActions[i] = moves[i];
-
-        for (int j=0; j<switches.Length; j++)
-            allActions[j+moves.Length] = switches[j];
+        var allActionsA = getAllActions(p, 0);
+        var allActionsB = getAllActions(p, 1);
+        var actionA = allActionsA[rng.Next(allActionsA.Length)];
+        var actionB = allActionsB[rng.Next(allActionsB.Length)];
         
-        return allActions;
+        b.MakeTurn(actionA, actionB);
+        int sample = randomRollout(b);
+        b.goBackTurn();
+
+        return sample;
     }
 
     public override Switch chooseSwitch(Battle b, int us)
     {
-        throw new NotImplementedException();
+        var switches = b.CurrPos.getAllSwitches(us);
+        return switches[rng.Next(switches.Length)];
     } 
 }

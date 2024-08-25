@@ -14,8 +14,10 @@ public static class Simulation
 
             parentBattle.MakeTurnAndWrite(actA, actB);
 
-            copyBattleA.copyFromParent(parentBattle);
-            copyBattleB.copyFromParent(parentBattle);
+            copyBattleA.copyPosFromParent(parentBattle);
+            copyBattleB.copyPosFromParent(parentBattle);
+            copyBattleA.nodeCount = 0;
+            copyBattleB.nodeCount = 0;
         }
 
         int result = parentBattle.CurrPos.getGameresult();
