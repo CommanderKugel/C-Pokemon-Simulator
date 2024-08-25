@@ -211,7 +211,7 @@ public class Battle
         they print to the command line and that might interfere with pygame-communication
     */
 
-    protected void MakeTurnAndWrite(Action actA, Action actB)
+    public void MakeTurnAndWrite(Action actA, Action actB)
     {
         if (this.ply >= MAX_PLY-1)
         {
@@ -296,7 +296,7 @@ public class Battle
     }
 
 
-    protected void MakeMoveAndWrite (
+    public void MakeMoveAndWrite (
         Move move, PokeCond attacker, PokeCond defender,
         bool useRandomRanges=true,
         bool useCritRoll=true,
@@ -347,7 +347,7 @@ public class Battle
         move.OnHitEffect(attacker, defender);
     }
 
-    protected void TakeActionAndWrite (Action a, PokeCond attacker, PokeCond defender) 
+    public void TakeActionAndWrite (Action a, PokeCond attacker, PokeCond defender) 
     {
         if (a is Move) MakeMoveAndWrite(a as Move, attacker, defender);
         else MakeSwitch(a as Switch);

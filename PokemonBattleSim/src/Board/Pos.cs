@@ -19,7 +19,7 @@ public struct Pos
     }
 
 
-    public bool isGameOver() => battle.ply == Battle.MAX_PLY || TeamHasFainted(0) || TeamHasFainted(1);
+    public bool isGameOver() => battle.ply == Battle.MAX_PLY-1 || TeamHasFainted(0) || TeamHasFainted(1);
     
     public int getGameResult() 
     {
