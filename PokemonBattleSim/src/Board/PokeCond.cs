@@ -7,6 +7,8 @@ public class PokeCond
     public sbyte[] StatChanges;
     public byte index;
 
+    public bool flinched = false;
+
     public PokeCond(Pokemon p)
     {
         pokemon = p;
@@ -34,12 +36,15 @@ public class PokeCond
     public Move[] Moveset => this.pokemon.MoveSet;
 
     // QUALITY IF LIFE METHODS THAT ARE NOT PLAIN REFERENCES
+
+    public void makeFlinch() => this.flinched = true;
+
     public bool isFainted => StatsEffective[HP] <= 0;
     public void dealDamage(int dmg) => this.StatsEffective[HP] = (short) Math.Max(this.StatsEffective[HP] - dmg, 0);
 
     public bool moveIsLearned(Move move) => this.pokemon.MoveSet.Contains(move);
     public bool canUseMove(Move move) => this.moveIsLearned(move); // Choice Items Here
-    public bool canMove() => true; // paralysis-, confusion-, flinchcheck here
+    public bool canMove() => !this.flinched; // paralysis-, confusion-check here
 
 
     public void CalculateStatsEffective() 

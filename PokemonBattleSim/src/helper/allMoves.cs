@@ -20,6 +20,9 @@ public static class allMoves
     // Stat-Lowering Moves
     public static Move Shadowball = new("Shadow Ball", Category.Special, PType.Ghost, 80, OnHitEffAct: lowerDefendersSpD, OnHitChance: 20);
 
+    // Flinching Moves
+    public static Move Waterfall = new("Waterfall", Category.Physical, PType.Water, 80, OnHitEffAct: flinch, OnHitChance: 10);
+
     // Status Moves
     public static Move Swordsdance = new("Swords Dance", Category.Status, PType.Normal, OnHitEffAct: raiseAttackTwice);
     public static Move Roost = new("Roost", Category.Status, PType.Flying, OnHitEffAct: healBy50);

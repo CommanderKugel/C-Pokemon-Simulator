@@ -8,15 +8,19 @@ public class Move : Action
 
     public readonly int Power;
     public readonly int Accuracy;
-    public readonly int OnHitChance;
 
     public bool misses => Accuracy < 100 && Helper.rng.Next(0, 100) > Accuracy;
 
     private readonly Func<Move, PokeCond, PokeCond, int> CalcDmgFunc;
     public int CalcDmg(PokeCond att, PokeCond def) => this.CalcDmgFunc(this, att, def);
 
-    private readonly Action<PokeCond, PokeCond, int> OnHitEffAct;
-    public void OnHitEffect(PokeCond attacker, PokeCond defender) => this.OnHitEffAct(attacker, defender, this.OnHitChance);
+    public readonly int OnHitChance;
+    private readonly Action<PokeCond, PokeCond> OnHitEffAct;
+    public void OnHitEffect(PokeCond attacker, PokeCond defender) 
+    { 
+        if (Helper.getRandomRoll(this.OnHitChance))
+            OnHitEffAct(attacker, defender);
+    }
  
     public Move (
         string name,
@@ -27,7 +31,7 @@ public class Move : Action
         int OnHitChance = 100,
         Func<Move, PokeCond, PokeCond, int> CalcDmgFunc = null,
         int Priority = 0,
-        Action<PokeCond, PokeCond, int> OnHitEffAct = null
+        Action<PokeCond, PokeCond> OnHitEffAct = null
     ) 
     : base(true, Priority) 
     {
@@ -35,6 +39,7 @@ public class Move : Action
         this.Category = Category;
         this.Type = Type;
         this.Accuracy = Accuracy;
+        this.OnHitChance = OnHitChance;
         this.Power = Power;
         this.CalcDmgFunc = CalcDmgFunc is null ? DamageCalc.CalculateRawDamage : CalcDmgFunc;
         this.OnHitEffAct = OnHitEffAct is null ? OnHitEffects.NoEffect : OnHitEffAct;

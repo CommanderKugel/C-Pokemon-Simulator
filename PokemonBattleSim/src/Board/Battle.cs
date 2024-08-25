@@ -64,7 +64,8 @@ public class Battle
     ) {
         
         // Faint check
-        if (attacker.isFainted) return;
+        if (attacker.isFainted) 
+            return;
 
         // check if making the move is even allowed
         if (!attacker.canUseMove(move))
@@ -165,7 +166,7 @@ public class Battle
                 pokeA = pos.getActivePokeCond(0);
         }
 
-        // Faint-check & switch ins if fainted
+        // Faint-check & switch-ins if one fainted
         if (pokeA.isFainted) 
         {
             if (faintCheckAll(0))
@@ -309,14 +310,19 @@ public class Battle
         // check if making the move is even allowed
         if (!attacker.canUseMove(move))
         {
-            Console.WriteLine($"{attacker} cant use {move}!");
+            if (attacker.flinched)
+                Console.WriteLine($"{attacker.Nickname} flinched");
+
+            else
+                Console.WriteLine($"{attacker} can not use {move}!");
+
             return;
         }
 
         // try missing the move
         if (canMiss && move.misses)
         {
-            Console.WriteLine("It missed!");
+            Console.WriteLine("it missed");
             return;
         }
 
